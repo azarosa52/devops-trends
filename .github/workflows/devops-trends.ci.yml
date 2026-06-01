@@ -1,4 +1,4 @@
-name: devops-trends CI
+name: devops-trends.Ci.yml
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
         run: mvn clean compile
 
       - name: Test
-        run: mvn test
+       run: mvn test
 
       - name: Package
         run: mvn package -DskipTests
