@@ -1,13 +1,15 @@
 job: devops-trends CI
+
 on:
   push:
     branches: [main]
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
-steps:
+    steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -30,4 +32,4 @@ steps:
         uses: actions/upload-artifact@v4
         with:
           name: devops-trends-war
-          path: target/devops-trends.war
+          path: target/devops-trends.war
