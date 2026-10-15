@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -7,43 +8,49 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 echo 'Pulling source code from GitHub...'
                 checkout scm
+            }
         }
 
         stage('Build') {
-            ste
+            steps {
+                echo 'Compiling the application...'
                 bat 'mvn clean compile'
             }
-    
+        }
+
+        stage('Test') {
             steps {
                 echo 'Running tests...'
-        
+                bat 'mvn test'
+            }
+        }
+
+        stage('Package') {
             steps {
-                echo 'Packaging into WAR file...'
+                echo 'Packaging application into a WAR file...'
                 bat 'mvn package -DskipTests'
             }
         }
 
+        stage('Deploy') {
             steps {
-                echo 'Deploying to local Tomcat...'
-                deploy adapters: [
-                    tomcat9(
-    
-                    )
-                ],
-                cont
-            echo 'App running at: http://35.181.124.166:8080/devops-trends'
+                echo 'WAR package created. Configure Tomcat deployment here.'
+                bat 'dir target'
+            }
         }
+    }
+
+    post {
         failure {
             echo 'Pipeline failed. Check console output for details.'
         }
+
         always {
-            echo 'Pipeline finished. Cleaning workspace...'
-            deleteDir()
+            echo 'Pipeline finished.'
         }
     }
 }
