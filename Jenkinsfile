@@ -10,7 +10,8 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Pulling sou
+                echo 'Pulling source code from GitHub...'
+                checkout scm
         }
 
         stage('Build') {
@@ -35,7 +36,7 @@ pipeline {
                     )
                 ],
                 cont
-            echo 'App running at: http://localhost:8080/devops-trends'
+            echo 'App running at: http://35.181.124.166:8080/devops-trends'
         }
         failure {
             echo 'Pipeline failed. Check console output for details.'
