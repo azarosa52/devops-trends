@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -8,49 +7,64 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Pulling source code from GitHub...'
-                checkout scm
+                git branch: 'main',
+                    credentialsId: 'GitHubCreds',
+                    url: 'https://github.com/PeterBulcke/devops-trends.git'
             }
         }
 
         stage('Build') {
             steps {
                 echo 'Compiling the application...'
-                bat 'mvn clean compile'
+                sh 'mvn clean compile'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                bat 'mvn test'
+                sh 'mvn test'
             }
         }
 
         stage('Package') {
             steps {
-                echo 'Packaging application into a WAR file...'
-                bat 'mvn package -DskipTests'
+                echo 'Packaging into WAR file...'
+                sh 'mvn package -DskipTests'
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy to Tomcat') {
             steps {
-                echo 'WAR package created. Configure Tomcat deployment here.'
-                bat 'dir target'
+                echo 'Deploying to local Tomcat...'
+                deploy adapters: [
+                    tomcat9(
+                        credentialsId: 'TomcatCreds',
+                        path: '/manager/text',
+                        url: 'http://13.39.88.130.218:8080'
+                    )
+                ],
+                contextPath: '/devops-trends',
+                war: "target/*.war"
             }
         }
     }
 
     post {
+        success {
+            echo 'Deployment successful!'
+            echo 'App running at: http://13.39.88.130:8080/devops-trends'
+        }
         failure {
             echo 'Pipeline failed. Check console output for details.'
         }
-
         always {
             echo 'Pipeline finished.'
+            cleanWs()   // or: deleteDir()
         }
     }
 }
