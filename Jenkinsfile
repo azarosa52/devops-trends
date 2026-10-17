@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     tools {
+        jdk 'JDK21'
         maven 'Maven-Auto'
     }
 
     triggers {
-        // Enable this trigger when configuring the GitHub webhook.
         githubPush()
     }
 
