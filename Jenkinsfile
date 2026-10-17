@@ -2,15 +2,19 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3.9.15'
-        jdk 'JDK21'
+        maven 'Maven-Auto'
+    }
+
+    triggers {
+        // Enable this trigger when configuring the GitHub webhook.
+        githubPush()
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 echo 'Pulling source code from GitHub...'
+
                 git branch: 'main',
                     credentialsId: 'GitHubCreds',
                     url: 'https://github.com/azarosa52/devops-trends.git'
@@ -35,36 +39,42 @@ pipeline {
             steps {
                 echo 'Packaging into WAR file...'
                 sh 'mvn package -DskipTests'
+
+                archiveArtifacts artifacts: 'target/*.war',
+                                 fingerprint: true
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                echo 'Deploying to local Tomcat...'
+                echo 'Deploying application to Tomcat...'
+
                 deploy adapters: [
                     tomcat9(
                         credentialsId: 'TomcatCreds',
                         path: '/manager/text',
-                        url: 'http://35.181.202.68:8080'
+                        url: 'http://15.237.116.104:8081'
                     )
                 ],
                 contextPath: '/devops-trends',
-                war: "target/*.war"
+                war: 'target/*.war'
             }
         }
     }
 
     post {
         success {
-            echo 'Deployment successful!'
-            echo 'App running at: http://35.181.124.166:8080/devops-trends'
+            echo 'Build and deployment successful!'
+            echo 'Application URL: http://15.237.116.104:8081/devops-trends'
         }
+
         failure {
-            echo 'Pipeline failed. Check console output for details.'
+            echo 'Pipeline failed. Check Console Output for details.'
         }
+
         always {
             echo 'Pipeline finished.'
-            cleanWs()   // or: deleteDir()
+            cleanWs()
         }
     }
 }
