@@ -53,7 +53,7 @@ pipeline {
                     tomcat9(
                         credentialsId: 'TomcatCreds',
                         path: '/manager/text',
-                        url: 'http://15.237.116.104:8081'
+                        url: 'http://15.236.143.121:8081'
                     )
                 ],
                 contextPath: '/devops-trends',
@@ -65,7 +65,7 @@ pipeline {
     post {
         success {
             echo 'Build and deployment successful!'
-            echo 'Application URL: http://15.237.116.104:8081/devops-trends'
+            echo 'Application URL: http://15.236.143.121:8081/devops-trends'
         }
 
         failure {
