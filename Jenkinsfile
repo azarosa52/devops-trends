@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        TOMCAT_URL = 'http://15.236.143.121:8081'
+        TOMCAT_URL = 'http://172.31.4.235:8081'
         APP_CONTEXT = '/devops-trends'
     }
 
