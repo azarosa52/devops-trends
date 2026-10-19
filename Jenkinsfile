@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -8,7 +7,7 @@ pipeline {
     }
 
     environment {
-        TOMCAT_URL = 'http://YOUR_TOMCAT_HOST:8080'
+        TOMCAT_URL = 'http://15.236.143.121:8081'
         APP_CONTEXT = '/devops-trends'
     }
 
