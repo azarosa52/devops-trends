@@ -50,8 +50,8 @@ pipeline {
                 echo 'Deploying application to Tomcat...'
 
                 deploy adapters: [
-                    tomcat9(
-                        credentialsId: 'TomcatCreds',
+                    tomcat10(
+                        credentialsId: 'Tomcat-jenkins-Creds',
                         path: '/manager/text',
                         url: 'http://15.236.143.121:8081'
                     )
