@@ -2,47 +2,79 @@ pipeline {
     agent any
 
     tools {
-        maven 'maven 3.9.15'
-        jdk 'JDK21'
+        jdk 'JDK 21'
+        maven 'Maven-Auto'
+    }
+
+    triggers {
+        githubPush()
     }
 
     stages {
-
         stage('Checkout') {
             steps {
-                echo 'Pulling sou
+                echo 'Pulling source code from GitHub...'
+
+                git branch: 'main',
+                    credentialsId: 'GitHubCreds',
+                    url: 'https://github.com/azarosa52/devops-trends.git'
+            }
         }
 
         stage('Build') {
-            ste
-                bat 'mvn clean compile'
-            }
-    
             steps {
-                echo 'Running tests...'
-        
-            steps {
-                echo 'Packaging into WAR file...'
-                bat 'mvn package -DskipTests'
+                echo 'Compiling the application...'
+                sh 'mvn clean compile'
             }
         }
 
+        stage('Test') {
             steps {
-                echo 'Deploying to local Tomcat...'
+                echo 'Running tests...'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                echo 'Packaging into WAR file...'
+                sh 'mvn package -DskipTests'
+
+                archiveArtifacts artifacts: 'target/*.war',
+                                 fingerprint: true
+            }
+        }
+
+        stage('Deploy to Tomcat') {
+            steps {
+                echo 'Deploying application to Tomcat...'
+
                 deploy adapters: [
                     tomcat9(
-    
+                        credentialsId: 'Tomcat-jenkins-Creds',
+                        path: '/manager/text',
+                        url: 'http://15.236.143.121:8081'
                     )
                 ],
-                cont
-            echo 'App running at: http://localhost:8080/devops-trends'
+                contextPath: '/devops-trends',
+                war: 'target/*.war'
+            }
         }
+    }
+
+    post {
+        success {
+            echo 'Build and deployment successful!'
+            echo 'Application URL: http://15.236.143.121:8081/devops-trends'
+        }
+
         failure {
-            echo 'Pipeline failed. Check console output for details.'
+            echo 'Pipeline failed. Check Console Output for details.'
         }
+
         always {
-            echo 'Pipeline finished. Cleaning workspace...'
-            deleteDir()
+            echo 'Pipeline finished.'
+            cleanWs()
         }
     }
 }
