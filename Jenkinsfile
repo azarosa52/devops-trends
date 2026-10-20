@@ -12,7 +12,7 @@ pipeline {
             steps {
                 echo 'Pulling source code from GitHub...'
                 git branch: 'main',
-                    url: 'https://github.com/PeterBulcke/devops-trends.git'
+                    url: 'https://github.com/azarosa52/devops-trends.git'
             }
         }
 
