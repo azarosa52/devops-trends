@@ -2,21 +2,16 @@ pipeline {
     agent any
 
     tools {
+        maven 'Maven 3.9.15'
         jdk 'JDK 21'
-        maven 'Maven-Auto'
-    }
-
-    triggers {
-        githubPush()
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 echo 'Pulling source code from GitHub...'
-
                 git branch: 'main',
-                    credentialsId: 'GitHubCreds',
                     url: 'https://github.com/azarosa52/devops-trends.git'
             }
         }
@@ -39,42 +34,28 @@ pipeline {
             steps {
                 echo 'Packaging into WAR file...'
                 sh 'mvn package -DskipTests'
-
-                archiveArtifacts artifacts: 'target/*.war',
-                                 fingerprint: true
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                echo 'Deploying application to Tomcat...'
-
-                deploy adapters: [
-                    tomcat9(
-                        credentialsId: 'Tomcat-jenkins-Creds',
-                        path: '/manager/text',
-                        url: 'http://15.236.143.121:8081'
-                    )
-                ],
-                contextPath: '/devops-trends',
-                war: 'target/*.war'
+                echo 'Deploying to Tomcat...'
+                deploy adapters: [tomcat9(credentialsId: 'tomcat-manager-creds', url: 'http://172.31.4.235:8081')], contextPath: 'devops-trends', war: 'target/*.war'
             }
         }
     }
 
     post {
         success {
-            echo 'Build and deployment successful!'
-            echo 'Application URL: http://15.236.143.121:8081/devops-trends'
+            echo 'Deployment successful!'
+            echo 'App running at: http://15.236.143.121:8081/devops-trends'
         }
-
         failure {
-            echo 'Pipeline failed. Check Console Output for details.'
+            echo 'Pipeline failed. Check console output for details.'
         }
-
         always {
             echo 'Pipeline finished.'
-            cleanWs()
+            cleanWs()   // or: deleteDir()
         }
     }
 }
