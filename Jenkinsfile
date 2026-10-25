@@ -40,7 +40,7 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 echo 'Deploying to Tomcat...'
-                deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://15.236.143.121:8081')], contextPath: 'devops-trends', war: 'target/*.war'
+                deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://172.31.11.184:8081')], contextPath: 'devops-trends', war: 'target/*.war'
             }
         }
     }
