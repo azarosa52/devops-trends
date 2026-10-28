@@ -47,7 +47,7 @@ pipeline {
             steps {
                 echo 'Deploying to Tomcat...'
                 script {
-                    deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://172.31.11.184:8081')],
+                    deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://15.236.143.121:8080')],
                            contextPath: 'devops-trends',
                            war: 'target/*.war'
                 }
@@ -58,7 +58,7 @@ pipeline {
     post {
         success {
             echo 'Deployment successful!'
-            echo 'App running at: http://15.236.143.121:8081/devops-trends'
+            echo 'App running at: http://15.236.143.121:8080/devops-trends'
         }
         failure {
             echo 'Pipeline failed. Check console output for details.'
