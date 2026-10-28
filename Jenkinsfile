@@ -19,30 +19,38 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Compiling the application...'
-              timeout(time: 10, unit: 'MINUTES') {  
-                sh 'mvn clean compile'
+                timeout(time: 10, unit: 'MINUTES') {
+                    sh 'mvn clean compile'
+                }
             }
         }
-    }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'mvn test'
+                timeout(time: 10, unit: 'MINUTES') {
+                    sh 'mvn test'
+                }
             }
         }
 
         stage('Package') {
             steps {
                 echo 'Packaging into WAR file...'
-                sh 'mvn package -DskipTests'
+                timeout(time: 10, unit: 'MINUTES') {
+                    sh 'mvn package -DskipTests'
+                }
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
                 echo 'Deploying to Tomcat...'
-                deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://172.31.11.184:8081')], contextPath: 'devops-trends', war: 'target/*.war'
+                script {
+                    deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://172.31.11.184:8081')],
+                           contextPath: 'devops-trends',
+                           war: 'target/*.war'
+                }
             }
         }
     }
@@ -57,7 +65,7 @@ pipeline {
         }
         always {
             echo 'Pipeline finished.'
-            cleanWs()   // or: deleteDir()
+            cleanWs()
         }
     }
 }
