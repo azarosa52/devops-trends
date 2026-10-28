@@ -19,6 +19,7 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Compiling the application...'
+              timeout(time: 10, unit: 'MINUTES') {  
                 sh 'mvn clean compile'
             }
         }
