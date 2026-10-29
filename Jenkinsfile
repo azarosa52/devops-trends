@@ -46,10 +46,29 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 echo 'Deploying to Tomcat...'
-                script {
-                    deploy adapters: [tomcat10(credentialsId: 'tomcat-credentials', url: 'http://15.236.143.121:8081')],
-                           contextPath: 'devops-trends',
-                           war: 'target/*.war'
+                withCredentials([usernamePassword(
+                    credentialsId: 'tomcat-credentials',
+                    usernameVariable: 'TOMCAT_USER',
+                    passwordVariable: 'TOMCAT_PASS'
+                )]) {
+                    script {
+                        def response = sh(
+                            script: '''
+                                curl -s -u "$TOMCAT_USER:$TOMCAT_PASS" \\
+                                -T target/*.war \\
+                                "http://15.236.143.121:8081/manager/text/deploy?path=/devops-trends&update=true"
+                            ''',
+                            returnStdout: true
+                        ).trim()
+
+                        echo "Tomcat response: ${response}"
+
+                        if (response.contains("FAIL")) {
+                            error("Deployment FAILED: ${response}")
+                        } else {
+                            echo "Deployment successful: ${response}"
+                        }
+                    }
                 }
             }
         }
@@ -58,7 +77,7 @@ pipeline {
     post {
         success {
             echo 'Deployment successful!'
-            echo 'App running at: http://15.236.143.121:8080/devops-trends'
+            echo 'App running at: http://15.236.143.121:8081/devops-trends'
         }
         failure {
             echo 'Pipeline failed. Check console output for details.'
