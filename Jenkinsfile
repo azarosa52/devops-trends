@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven 'Maven 3.9.15'
-        jdk 'JDK 21'
+        jdk 'JDK21'
     }
 
     stages {
@@ -19,28 +19,57 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Compiling the application...'
-                sh 'mvn clean compile'
+                timeout(time: 10, unit: 'MINUTES') {
+                    sh 'mvn clean compile'
+                }
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                sh 'mvn test'
+                timeout(time: 10, unit: 'MINUTES') {
+                    sh 'mvn test'
+                }
             }
         }
 
         stage('Package') {
             steps {
                 echo 'Packaging into WAR file...'
-                sh 'mvn package -DskipTests'
+                timeout(time: 10, unit: 'MINUTES') {
+                    sh 'mvn package -DskipTests'
+                }
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
                 echo 'Deploying to Tomcat...'
-                deploy adapters: [tomcat9(credentialsId: 'tomcat-manager-creds', url: 'http://172.31.4.235:8081')], contextPath: 'devops-trends', war: 'target/*.war'
+                withCredentials([usernamePassword(
+                    credentialsId: 'tomcat-credentials',
+                    usernameVariable: 'TOMCAT_USER',
+                    passwordVariable: 'TOMCAT_PASS'
+                )]) {
+                    script {
+                        def response = sh(
+                            script: '''
+                                curl -s -u "$TOMCAT_USER:$TOMCAT_PASS" \\
+                                -T target/*.war \\
+                                "http://15.236.143.121:8081/manager/text/deploy?path=/devops-trends&update=true"
+                            ''',
+                            returnStdout: true
+                        ).trim()
+
+                        echo "Tomcat response: ${response}"
+
+                        if (response.contains("FAIL")) {
+                            error("Deployment FAILED: ${response}")
+                        } else {
+                            echo "Deployment successful: ${response}"
+                        }
+                    }
+                }
             }
         }
     }
@@ -55,7 +84,7 @@ pipeline {
         }
         always {
             echo 'Pipeline finished.'
-            cleanWs()   // or: deleteDir()
+            cleanWs()
         }
     }
 }
