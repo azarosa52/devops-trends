@@ -47,7 +47,7 @@ pipeline {
             steps {
                 echo 'Deploying to Tomcat...'
                 script {
-                    deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://15.236.143.121:8080')],
+                    deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', url: 'http://15.236.143.121:8081')],
                            contextPath: 'devops-trends',
                            war: 'target/*.war'
                 }
