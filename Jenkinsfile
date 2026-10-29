@@ -56,7 +56,7 @@ pipeline {
                             script: '''
                                 curl -s -u "$TOMCAT_USER:$TOMCAT_PASS" \\
                                 -T target/*.war \\
-                                "http://15.236.143.121:8081/manager/text/deploy?path=/devops-trends&update=true"
+                                "http://15.236.143.121:8080/manager/text/deploy?path=/devops-trends&update=true"
                             ''',
                             returnStdout: true
                         ).trim()
@@ -77,7 +77,7 @@ pipeline {
     post {
         success {
             echo 'Deployment successful!'
-            echo 'App running at: http://15.236.143.121:8081/devops-trends'
+            echo 'App running at: http://15.236.143.121:8080/devops-trends'
         }
         failure {
             echo 'Pipeline failed. Check console output for details.'
