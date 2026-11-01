@@ -1,75 +1,72 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven 3.9.15'
-        jdk 'JDK21'
+    environment {
+        // Tomcat private IP (deploys)
+        TOMCAT_URL = 'http://<172.31.13.195>:8080'
+
+        // Tomcat Elastic IP (browsing)
+        TOMCAT_PUBLIC_URL = 'http://<15.236.143.121>:8080'
+
+        // Tomcat application path
+        CONTEXT_PATH = '/devops-trends'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 echo 'Pulling source code from GitHub...'
+
+                // Use the GitHub credential ID
                 git branch: 'main',
-                    url: 'https://github.com/azarosa52/devops-trends.git'
+                    credentialsId: '
+                    url: 'https://github.com/<azarosa52>/devops-trends.git'
             }
         }
 
         stage('Build') {
             steps {
                 echo 'Compiling the application...'
-                timeout(time: 10, unit: 'MINUTES') {
-                    sh 'mvn clean compile'
-                }
+
+                // Compile with Maven
+                sh 'mvn -B clean compile'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                timeout(time: 10, unit: 'MINUTES') {
-                    sh 'mvn test'
-                }
+
+                // Run Maven tests
+                sh 'mvn -B test'
             }
         }
 
         stage('Package') {
             steps {
                 echo 'Packaging into WAR file...'
-                timeout(time: 10, unit: 'MINUTES') {
-                    sh 'mvn package -DskipTests'
-                }
+
+                // Package WAR without rerunning tests
+                sh 'mvn -B package -DskipTests'
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                echo 'Deploying to Tomcat...'
-                withCredentials([usernamePassword(
-                    credentialsId: 'tomcat-credentials',
-                    usernameVariable: 'TOMCAT_USER',
-                    passwordVariable: 'TOMCAT_PASS'
-                )]) {
-                    script {
-                        def response = sh(
-                            script: '''
-                                curl -s -u "$TOMCAT_USER:$TOMCAT_PASS" \\
-                                -T target/*.war \\
-                                "http://15.236.143.121:8080/manager/text/deploy?path=/devops-trends&update=true"
-                            ''',
-                            returnStdout: true
-                        ).trim()
+                echo "Deploying to Tomcat EC2 at ${TOMCAT_URL}..."
 
-                        echo "Tomcat response: ${response}"
+                // Use the Deploy to container plugin
+                // Use the Tomcat credential ID
+                deploy adapters: [
+                    tomcat9(
+                        credentialsId: 'jenkins-deployer',
+                        url: "${TOMCAT_URL}"
+                    )
+                ],
 
-                        if (response.contains("FAIL")) {
-                            error("Deployment FAILED: ${response}")
-                        } else {
-                            echo "Deployment successful: ${response}"
-                        }
-                    }
-                }
+                // Set the deployment context path
+                contextPath: "${CONTEXT_PATH}",
+                war: 'target/devops-trends.war'
             }
         }
     }
@@ -77,13 +74,16 @@ pipeline {
     post {
         success {
             echo 'Deployment successful!'
-            echo 'App running at: http://15.236.143.121:8080/devops-trends'
+            echo "Deployed to ${TOMCAT_URL}${CONTEXT_PATH} (Tomcat Private IP)"
+            echo "View the app at ${TOMCAT_PUBLIC_URL}${CONTEXT_PATH}"
         }
+
         failure {
             echo 'Pipeline failed. Check console output for details.'
         }
+
         always {
-            echo 'Pipeline finished.'
+            echo 'Pipeline finished. Cleaning workspace...'
             cleanWs()
         }
     }
