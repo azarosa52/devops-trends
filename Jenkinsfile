@@ -3,10 +3,10 @@ pipeline {
 
     environment {
         // Tomcat private IP (deploys)
-        TOMCAT_URL = 'http://<172.31.13.195>:8080'
+        TOMCAT_URL = 'http://172.31.13.195:8080'
 
         // Tomcat Elastic IP (browsing)
-        TOMCAT_PUBLIC_URL = 'http://<15.236.143.121>:8080'
+        TOMCAT_PUBLIC_URL = 'http://15.236.143.121:8080'
 
         // Tomcat application path
         CONTEXT_PATH = '/devops-trends'
