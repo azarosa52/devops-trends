@@ -1,23 +1,20 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'maven 3.9.15'
+    }
+
     environment {
-        // Tomcat private IP (deploys)
-        TOMCAT_URL = 'http://172.31.13.195:8080'
-
-        // Tomcat Elastic IP (browsing)
+        TOMCAT_URL        = 'http://172.31.13.195:8080'
         TOMCAT_PUBLIC_URL = 'http://15.236.143.121:8080'
-
-        // Tomcat application path
-        CONTEXT_PATH = '/devops-trends'
+        CONTEXT_PATH      = '/devops-trends'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo 'Pulling source code from GitHub...'
-
-                // Use the GitHub credential ID
                 git branch: 'main',
                     credentialsId: 'github-pat-jenkins',
                     url: 'https://github.com/azarosa52/devops-trends.git'
@@ -27,8 +24,6 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Compiling the application...'
-
-                // Compile with Maven
                 sh 'mvn -B clean compile'
             }
         }
@@ -36,8 +31,6 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running tests...'
-
-                // Run Maven tests
                 sh 'mvn -B test'
             }
         }
@@ -45,8 +38,6 @@ pipeline {
         stage('Package') {
             steps {
                 echo 'Packaging into WAR file...'
-
-                // Package WAR without rerunning tests
                 sh 'mvn -B package -DskipTests'
             }
         }
@@ -55,18 +46,17 @@ pipeline {
             steps {
                 echo "Deploying to Tomcat EC2 at ${TOMCAT_URL}..."
 
-                // Use the Deploy to container plugin
-                // Use the Tomcat credential ID
-                deploy adapters: [
-                    tomcat9(
-                        credentialsId: 'jenkins-deployer',
-                        url: "${TOMCAT_URL}"
-                    )
-                ],
-
-                // Set the deployment context path
-                contextPath: "${CONTEXT_PATH}",
-                war: 'target/devops-trends.war'
+                withCredentials([usernamePassword(
+                    credentialsId: 'jenkins-deployer',
+                    usernameVariable: 'TOMCAT_USER',
+                    passwordVariable: 'TOMCAT_PASS'
+                )]) {
+                    sh '''
+                        curl -f -T target/devops-trends.war \
+                          -u "$TOMCAT_USER:$TOMCAT_PASS" \
+                          "http://172.31.13.195:8080/manager/text/deploy?path=/devops-trends&update=true"
+                    '''
+                }
             }
         }
     }
