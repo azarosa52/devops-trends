@@ -20,7 +20,7 @@ pipeline {
                 // Use the GitHub credential ID
                 git branch: 'main',
                     credentialsId: 'github-pat-jenkins'
-                    url: 'https://github.com/<azarosa52>/devops-trends.git'
+                    url: 'https://github.com/azarosa52/devops-trends.git'
             }
         }
 
