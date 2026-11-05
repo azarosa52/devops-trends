@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        TOMCAT_URL        = 'http://172.31.13.195:8080'
+        TOMCAT_URL        = 'http://172.31.11.118:8080'
         TOMCAT_PUBLIC_URL = 'http://15.236.143.121:8080'
         CONTEXT_PATH      = '/devops-trends'
     }
@@ -54,7 +54,7 @@ pipeline {
                     sh '''
                         curl -f -T target/devops-trends.war \
                           -u "$TOMCAT_USER:$TOMCAT_PASS" \
-                          "http://172.31.13.195:8080/manager/text/deploy?path=/devops-trends&update=true"
+                          "http://172.31.11.118:8080/manager/text/deploy?path=/devops-trends&update=true"
                     '''
                 }
             }
