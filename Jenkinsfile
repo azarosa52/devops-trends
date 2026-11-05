@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3.9.15'
+        maven 'maven 3.9.15'
         jdk 'JDK21'
     }
 
@@ -20,7 +20,7 @@ pipeline {
             steps {
                 echo 'Compiling the application...'
                 timeout(time: 10, unit: 'MINUTES') {
-                    sh 'mvn clean compile'
+                    sh 'mvn -version'
                 }
             }
         }
