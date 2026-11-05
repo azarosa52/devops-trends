@@ -52,7 +52,7 @@ pipeline {
                     passwordVariable: 'TOMCAT_PASS'
                 )]) {
                     sh '''
-                        curl -f -T target/devops-trends.war \
+                        curl -F "filedata=@target/devops-trends.war \
                           -u "$TOMCAT_USER:$TOMCAT_PASS" \
                           "http://172.31.11.118:8080/manager/text/deploy?path=/devops-trends&update=true"
                     '''
