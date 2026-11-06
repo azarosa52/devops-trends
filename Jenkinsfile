@@ -3,15 +3,20 @@ pipeline {
 
     tools {
         maven 'maven 3.9.15'
-        jdk 'JDK21'
+    }
+
+    environment {
+        TOMCAT_URL        = 'http://172.31.11.118:8080'
+        TOMCAT_PUBLIC_URL = 'http://15.236.143.121:8080'
+        CONTEXT_PATH      = '/devops-trends'
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 echo 'Pulling source code from GitHub...'
                 git branch: 'main',
+                    credentialsId: 'github-pat-jenkins',
                     url: 'https://github.com/azarosa52/devops-trends.git'
             }
         }
@@ -19,56 +24,38 @@ pipeline {
         stage('Build') {
             steps {
                 echo 'Compiling the application...'
-                timeout(time: 10, unit: 'MINUTES') {
-                    sh 'mvn -version'
-                }
+                sh 'mvn -version'
             }
         }
 
         stage('Test') {
             steps {
                 echo 'Running tests...'
-                timeout(time: 10, unit: 'MINUTES') {
-                    sh 'mvn test'
-                }
+                sh 'mvn -B test'
             }
         }
 
         stage('Package') {
             steps {
                 echo 'Packaging into WAR file...'
-                timeout(time: 10, unit: 'MINUTES') {
-                    sh 'mvn package -DskipTests'
-                }
+                sh 'mvn -B package -DskipTests'
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                echo 'Deploying to Tomcat...'
+                echo "Deploying to Tomcat EC2 at ${TOMCAT_URL}..."
+
                 withCredentials([usernamePassword(
-                    credentialsId: 'tomcat-credentials',
+                    credentialsId: 'jekins-deployer',
                     usernameVariable: 'TOMCAT_USER',
                     passwordVariable: 'TOMCAT_PASS'
                 )]) {
-                    script {
-                        def response = sh(
-                            script: '''
-                                curl -s -u "$TOMCAT_USER:$TOMCAT_PASS" \\
-                                -T target/*.war \\
-                                "http://15.236.143.121:8080/manager/text/deploy?path=/devops-trends&update=true"
-                            ''',
-                            returnStdout: true
-                        ).trim()
-
-                        echo "Tomcat response: ${response}"
-
-                        if (response.contains("FAIL")) {
-                            error("Deployment FAILED: ${response}")
-                        } else {
-                            echo "Deployment successful: ${response}"
-                        }
-                    }
+                    sh '''
+                        curl -f -u "$TOMCAT_USER:$TOMCAT_PASS" \
+                          --upload-file target/devops-trends.war \
+                          "http://172.31.11.118:8080/manager/text/deploy?path=/devops-trends&update=true"
+                    '''
                 }
             }
         }
@@ -77,13 +64,16 @@ pipeline {
     post {
         success {
             echo 'Deployment successful!'
-            echo 'App running at: http://15.236.143.121:8080/devops-trends'
+            echo "Deployed to ${TOMCAT_URL}${CONTEXT_PATH} (Tomcat Private IP)"
+            echo "View the app at ${TOMCAT_PUBLIC_URL}${CONTEXT_PATH}"
         }
+
         failure {
             echo 'Pipeline failed. Check console output for details.'
         }
+
         always {
-            echo 'Pipeline finished.'
+            echo 'Pipeline finished. Cleaning workspace...'
             cleanWs()
         }
     }
