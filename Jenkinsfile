@@ -53,7 +53,7 @@ pipeline {
                 )]) {
                     sh '''
                         curl -f -u "$TOMCAT_USER:$TOMCAT_PASS" \
-                          -F "filedata=@target/devops-trends.war" \
+                          --upload-file target/devops-trends.war \
                           "http://172.31.11.118:8080/manager/text/deploy?path=/devops-trends&update=true"
                     '''
                 }
