@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        TOMCAT_URL        = 'http://172.31.0.87:8080'
+        TOMCAT_URL        = 'http://172.31.6.237:8080'
         TOMCAT_PUBLIC_URL = 'http://15.236.143.121:8080'
         CONTEXT_PATH      = '/devops-trends'
     }
