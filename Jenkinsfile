@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3.9.12'
+        maven 'Maven 3.9.15'
     }
 
     environment {
@@ -54,7 +54,7 @@ pipeline {
                     sh '''
                         curl -u "$TOMCAT_USER:$TOMCAT_PASS" \
                           -T target/devops-trends.war \
-                          "http://172.31.6.237:8080/manager/text/deploy?path=/devops-trends&update=true"
+                          "http://172.31.35.96:8080/manager/text/deploy?path=/devops-trends&update=true"
                     '''
                 }
             }
