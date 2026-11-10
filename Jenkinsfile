@@ -47,14 +47,14 @@ pipeline {
                 echo "Deploying to Tomcat EC2 at ${TOMCAT_URL}..."
 
                 withCredentials([usernamePassword(
-                    credentialsId: 'jenkins-deployer',
+                    credentialsId: 'TomcatCreds',
                     usernameVariable: 'TOMCAT_USER',
                     passwordVariable: 'TOMCAT_PASS'
                 )]) {
                     sh '''
                         curl -u "$TOMCAT_USER:$TOMCAT_PASS" \
                           -T target/devops-trends.war \
-                          "http://172.31.35.96:8080/manager/text/deploy?path=/devops-trends&update=true"
+                          "http://172.31.6.237:8080/manager/text/deploy?path=/devops-trends&update=true"
                     '''
                 }
             }
