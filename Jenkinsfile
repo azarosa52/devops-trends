@@ -54,7 +54,11 @@ pipeline {
                     sh '''
                         curl -u "$TOMCAT_USER:$TOMCAT_PASS" \
                           -T target/devops-trends.war \
+<<<<<<< HEAD
                           "http://172.31.34.11:8080/manager/text/deploy?path=/devops-trends&update=true"
+=======
+                          "http://172.31.34.34.11:8080/manager/text/deploy?path=/devops-trends&update=true"
+>>>>>>> 635360848953babd5a61810899152033e018b62b
                     '''
                 }
             }
