@@ -47,7 +47,7 @@ pipeline {
                 echo "Deploying to Tomcat EC2 at ${TOMCAT_URL}..."
 
                 withCredentials([usernamePassword(
-                    credentialsId: 'jenkins-deployer',
+                    credentialsId: 'TomcatCreds',
                     usernameVariable: 'TOMCAT_USER',
                     passwordVariable: 'TOMCAT_PASS'
                 )]) {
