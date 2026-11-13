@@ -1,38 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
+   
     <groupId>com.devopstrends</groupId>
     <artifactId>devops-trends-maven</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>DevOps Trends Web Application</name>
-    
+   
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
-    
+   
     <dependencies>
         <!-- Servlet API -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!-- JSTL for JSP -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jstl</artifactId>
-            <version>1.2</version>
-        </dependency>
-        
+       
         <!-- JUnit for testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -40,14 +33,14 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-        
+       
         <!-- SLF4J API for logging -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.36</version>
         </dependency>
-        
+       
         <!-- SLF4J Simple implementation -->
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -55,7 +48,7 @@
             <version>1.7.36</version>
         </dependency>
     </dependencies>
-    
+   
     <build>
         <finalName>devops-trends</finalName>
         <plugins>
@@ -69,7 +62,7 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-            
+           
             <!-- Maven WAR Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -79,21 +72,21 @@
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
             </plugin>
-            
+           
             <!-- Maven Clean Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.2.0</version>
             </plugin>
-            
+           
             <!-- Maven Resources Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.3.0</version>
             </plugin>
-            
+           
             <!-- Maven Surefire Plugin for testing -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
