@@ -1,4 +1,4 @@
-﻿// src/main/java/com/devopstrends/servlet/StatusServlet.java
+// src/main/java/com/devopstrends/servlet/StatusServlet.java
 package com.devopstrends.servlet;
 
 import jakarta.servlet.ServletException;
