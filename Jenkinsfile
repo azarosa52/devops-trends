@@ -66,7 +66,7 @@ pipeline {
                     sh '''
                         curl -f -u "$TOMCAT_USER:$TOMCAT_PASS" \
                           -T target/devops-trends.war \
-                          "http://172.31.1.10:8080/manager/text/deploy?path=/devops-trends&update=true"
+                          "${TOMCAT_URL}/manager/text/deploy?path=/devops-trends&update=true"
                     '''
                 }
             }
