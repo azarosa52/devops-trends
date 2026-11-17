@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         // Tomcat private IP (deploys)
-        TOMCAT_URL        = 'http://172.31.6.41:8080'
+        TOMCAT_URL        = 'http://172.31.1.10:8080'
         // Tomcat Elastic IP (browsing)
         TOMCAT_PUBLIC_URL = 'http://15.236.143.121:8080'
         // Tomcat application path
@@ -64,20 +64,9 @@ pipeline {
                     passwordVariable: 'TC_PASS'
                 )]) {
                     sh '''
-                        set -eu
-                        WAR_PATH="${APP_DIR}/target/${WAR_FILE}"
-                        if [ ! -f "$WAR_PATH" ]; then
-                            echo "ERROR: WAR file not found at $WAR_PATH" >&2
-                            exit 1
-                        fi
-
-                        RESPONSE=$(curl -sS --fail-with-body \
-                            -u "$TC_USER:$TC_PASS" \
-                            -T "$WAR_PATH" \
-                            "$TOMCAT_URL/manager/text/deploy?path=$CONTEXT_PATH&update=true")
-
-                        echo "$RESPONSE"
-                        echo "$RESPONSE" | grep -q '^OK'
+                        curl -f -u "$TOMCAT_USER:$TOMCAT_PASS" \
+                          -T target/devops-trends.war \
+                          "http://172.31.1.10:8080/manager/text/deploy?path=/devops-trends&update=true"
                     '''
                 }
             }
