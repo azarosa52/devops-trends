@@ -64,7 +64,7 @@ pipeline {
                     passwordVariable: 'TC_PASS'
                 )]) {
                     sh '''
-                        curl -f -u "$TOMCAT_USER:$TOMCAT_PASS" \
+                        curl -f -u "$TC_USER:$TC_PASS" \
                           -T target/devops-trends.war \
                           "${TOMCAT_URL}/manager/text/deploy?path=/devops-trends&update=true"
                     '''
